@@ -16,7 +16,7 @@ import logging
 startId = sys.argv[1]
 stopId = sys.argv[2]
 
-filename = 'wikicfp-events'
+filename ='wikicfp-events'
 
 # if parameter thread is given take it otherwise use 1 threads as default
 if len(sys.argv) == 4: threads = sys.argv[3]
