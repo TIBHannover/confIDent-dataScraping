@@ -16,7 +16,7 @@ import logging
 startId = sys.argv[1]
 stopId = sys.argv[2]
 
-filename = 'wikicfp-events'
+filename ='wikicfp-events'
 
 # if parameter thread is given take it otherwise use 1 threads as default
 if len(sys.argv) == 4: threads = sys.argv[3]
@@ -109,7 +109,7 @@ def threadedFunction(filename, startId, stopId):
 # determine the id range for each thread
 id_range = int(stopId) - int(startId)
 chunkSize = int(id_range) / int(threads)
-print('We have ' + str(threads) + ' threads with chunks of ' + str(int(chunkSize))+ ' IDs each')
+print(('We have ' + str(threads) + ' threads with chunks of ' + str(int(chunkSize))+ ' IDs each'))
 
 # this list will contain all threads -> we can wait for all to finish at the end
 allThreads = []
@@ -123,7 +123,7 @@ for i in range(int(threads)):
     if i == int(threads) - 1:
         e += 1
 
-    print('threadedFunction with:' + str(int(s)) + ' and ' + str(int(e)))
+    print(('threadedFunction with:' + str(int(s)) + ' and ' + str(int(e))))
     threadFilename = filename + '_' + str(int(s)) + '-' + str(int(e)) + '.csv'
 
     thread = threading.Thread(target = threadedFunction, args=[threadFilename, s, e])
