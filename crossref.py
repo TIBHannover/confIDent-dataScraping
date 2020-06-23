@@ -4,59 +4,58 @@
 import json
 import requests
 import csv
-from pprint import pprint
+import urllib.parse
 
-# functions
-
-# call crossref api
-def getData(cursor):
-    return requests.get("https://api.crossref.org/types/proceedings/works?rows="+str(rows)+"&cursor="+cursor).json()
-
-# handle and write data to file
-def handleData(response):
-    # prepare output file
-    with open(filename, 'w') as csvfile:
-        file = csv.DictWriter(csvfile, fieldnames = fieldnames)
-        file.writeheader()
-
-        print('handleData', response['message'].keys())
-        # NOTE: slow as a lot of the reponse['message'] does not have keu 'item'
-        # TODO: can getData() API ca;; only return response['message'] w/ item key??
-        for item in response['message']:
-            if 'item' in response['message'].keys():
-                item = item['items']
-                print('item')
-                pprint(item)
-                metadata = item['event']
-                #  metadata = response['message']['items'][i]['event']
-
-                # add the title and doi of the proceeding
-                # TODO: .replace('\n', '')
-                metadata['proceedings-title'] = item['title']
-                # metadata['proceedings-title'] = response['message']['items'][i][
-                # 'title']
-                #''.join(response['message']['items'][i]['title']).encode('utf-8')
-
-                metadata['doi'] = item['DOI']
-                # metadata['doi'] = response['message']['items'][i]['DOI']
-
-                # TODO: fix encoding
-                # [''.join(x).encode('utf-8') for x in metadata ]
-                print(metadata)
-
-                # write metadata to file
-                # file.writerow(metadata)
-
-# variables
-rows = 10
+# VARIABLES
+rows = 10 # number of items on a result page
 filename = 'crossref-events-from-proceedings.csv'
 fieldnames = ['name', 'start', 'end', 'acronym', 'location', 'number', 'sponsor', 'theme', 'proceedings-title', 'doi']
 
-# main: get and handle data, go to next page using the cursor
-response = getData('*')
-handleData(response)
-cursor = response['message']['next-cursor']
+# FUNCTIONS
 
-while cursor:
-    response = getData(cursor)
-    handleData(response)
+# call crossref api
+def getData(cursor):
+
+    return requests.get("https://api.crossref.org/types/proceedings/works?select=event,title,DOI&rows="+str(rows)+"&cursor="+cursor).json()
+
+# handle and write data to file
+def handleData(response, file):
+
+        # get all entries
+        for i in range(1, int(rows), 1):
+
+            # get this item from response
+            item =  response['message']['items'][i]
+
+            # read the metadata of one event from item
+            metadata = item['event']
+
+            # add the title and doi of the proceeding
+            metadata['proceedings-title'] = item['title']
+            metadata['doi'] = item['DOI']
+
+            # write metadata to file
+            file.writerow(metadata)
+
+        # read and return next cursor
+        return urllib.parse.quote(response['message']['next-cursor'])
+
+# MAIN
+
+# prepare output file
+with open(filename, 'w') as csvfile:
+    file = csv.DictWriter(csvfile, fieldnames = fieldnames)
+    file.writeheader()
+
+    # get and handle data
+    response = getData('*')
+    cursor = handleData(response, file)
+
+    # get next page using cursor
+    counter = 0
+    while cursor:
+        if counter >= 10: break # for testing
+        counter += 1
+        print(cursor)
+        response = getData(cursor)
+        cursor = handleData(response, file)
