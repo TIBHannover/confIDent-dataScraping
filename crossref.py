@@ -7,7 +7,8 @@ import csv
 import urllib.parse
 
 # VARIABLES
-rows = 10 # number of items on a result page
+rows = 100 # number of items on a result page
+breakpoint = 10 # for testing (uncomment line 58 if you want to use it)
 filename = 'crossref-events-from-proceedings.csv'
 fieldnames = ['name', 'start', 'end', 'acronym', 'location', 'number', 'sponsor', 'theme', 'proceedings-title', 'doi']
 
@@ -30,7 +31,14 @@ def handleData(response, file):
             # read the metadata of one event from item
             metadata = item['event']
 
-            # add the title and doi of the proceeding
+            # remove data parts stuff
+            if metadata.get('start'):
+                metadata['start'] = item['event']['start']['date-parts']
+
+            if metadata.get('end'):
+                metadata['end'] = item['event']['end']['date-parts']
+
+            # add title and doi of the proceeding
             metadata['proceedings-title'] = item['title']
             metadata['doi'] = item['DOI']
 
@@ -54,7 +62,7 @@ with open(filename, 'w') as csvfile:
     # get next page using cursor
     counter = 0
     while cursor:
-        if counter >= 10: break # for testing
+#        if counter >= breakpoint: break # for testing
         counter += 1
         print(cursor)
         response = getData(cursor)
