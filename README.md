@@ -11,8 +11,9 @@ python script to get event metadata from wikicfp
 
 ## Usage
 
-run it with the following parameters (maximum number of threads is 10): `python3 wikicfp.py [startId] [stopId] [threads]`
-example: `python3 wikicfp.py 2000 2999 10`
+run it with the following parameters (maximum number of threads is 10):
+* `python3 wikicfp.py [startId] [stopId] [threads]`
+* example: `python3 wikicfp.py 2000 2999 10`
     
     
 # Event Metadata from Crossref
@@ -26,4 +27,4 @@ python script to get event metadata from crossref https://www.crossref.org/educa
 
 ## Usage
 
-run code at command line: `python3 crossref.py
+run code at command line: `python3 crossref.py`
